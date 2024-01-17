@@ -251,9 +251,7 @@
         @if (!in_array(Route::currentRouteName(), array('mailboxes.view'))
             && empty(app('request')->x_embed) && empty($__env->yieldContent('no_footer')))
             <div class="footer">
-                @if (!\Eventy::filter('footer.text', ''))
-                    &copy; 2018-{{ date('Y') }} <a href="{{ config('app.freescout_url') }}" target="blank">{{ \Config::get('app.name') }}</a> — {{ __('Free open source help desk & shared mailbox') }}
-                @else
+                @if (\Eventy::filter('footer.text', ''))
                     {!! \Eventy::filter('footer.text', '') !!}
                 @endif
                 @if (!Auth::user())
