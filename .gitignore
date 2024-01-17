@@ -25,7 +25,6 @@ Thumbs.db
 /public/js/builds/
 /public/.well-known
 /Modules/**/.git
-/public/modules
 /public/docs
 /storage/.ignore_locales
 /storage/.installed
