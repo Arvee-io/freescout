@@ -3157,8 +3157,8 @@ fieldset[disabled] .btn-default.focus {
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
   color: #fff;
-  background-color: #104a7d;
-  border-color: #104a7d;
+  background-color: #704d9f;
+  border-color: #704d9f;
 }
 .btn-primary:active:hover,
 .btn-primary.active:hover,
@@ -3170,8 +3170,8 @@ fieldset[disabled] .btn-default.focus {
 .btn-primary.active.focus,
 .open > .dropdown-toggle.btn-primary.focus {
   color: #fff;
-  background-color: #104a7d;
-  border-color: #104a7d;
+  background-color: #704d9f;
+  border-color: #704d9f;
 }
 .btn-primary:active,
 .btn-primary.active,
@@ -4527,14 +4527,14 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default .navbar-brand:hover/*,
 .navbar-default .navbar-brand:focus*/ {
   color: #5e5e5e;
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 .navbar-default .navbar-brand.active {
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 .navbar-default .navbar-brand.active:hover/*,
 .navbar-default .navbar-brand.active:focus*/ {
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 .navbar-default .navbar-text {
   color: #777;
@@ -4548,7 +4548,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default .navbar-nav > li > a:focus*/ {
   color: #fff;
   /*background-color: transparent;*/
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 
 /*.navbar-default .navbar-nav > li > a:focus {
@@ -4561,7 +4561,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   /*color: #555;
   background-color: #e7e7e7;*/
   color: #fff;
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 .navbar-default .navbar-nav > .disabled > a,
 .navbar-default .navbar-nav > .disabled > a:hover,
@@ -4589,7 +4589,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default .navbar-nav > .open > a:focus {
   color: #fff;
   /*background-color: transparent;*/
-  background-color: #104a7d;
+  background-color: #704d9f;
 }
 @media (max-width: 767px) {
 

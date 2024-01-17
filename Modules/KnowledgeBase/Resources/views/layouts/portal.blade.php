@@ -9,8 +9,6 @@
 	    <meta name="csrf-token" content="{{ csrf_token() }}">
 	    {!! \Helper::cspMetaTag() !!}
 
-	    <meta name="robots" content="noindex, nofollow">
-
 	    <title>@if (View::getSection('title') != \Kb::getKbName($mailbox))@yield('title') - {{ \Kb::getKbName($mailbox) }}@else{{ \Kb::getKbName($mailbox) }}@endif</title>
 	    
 	    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
@@ -58,7 +56,8 @@
 	                <div class="collapse navbar-collapse" id="app-navbar-collapse">
 	                    <!-- Left Side Of Navbar -->
 	                    <ul class="nav navbar-nav navbar-right">
-	                    	<li class="{{ \App\Misc\Helper::menuSelectedHtml('knowledgebase.frontend.home') }}"><a href="{{ \Kb::getKbUrl($mailbox) }}">{{ __('Home') }}</a></li>
+	                    	<li class="{{ \App\Misc\Helper::menuSelectedHtml('knowledgebase.frontend.home') }}"><a href="https://app.arvee.io" target="_blank">{{ __('Arvee App') }}</a></li>
+	                    	<li class="{{ \App\Misc\Helper::menuSelectedHtml('knowledgebase.frontend.home') }}"><a href="{{ \Kb::getKbUrl($mailbox) }}">{{ __('KB Home') }}</a></li>
 	                    	@if (\Kb::getMenu($mailbox))
 	                    		@foreach(\Kb::getMenu($mailbox) as $button_title => $button_url)
 	                    			<li><a href="{{ $button_url }}">{{ $button_title }}</a></li>
