@@ -157,7 +157,7 @@
 	    @php
 	        try {
 	    @endphp
-	    {!! Minify::javascript(\Eventy::filter('kb.javascripts', ['/js/jquery.js', '/js/bootstrap.js', '/js/lang.js', '/storage/js/vars.js', '/js/laroute.js', '/js/parsley/parsley.min.js', '/js/parsley/i18n/'.strtolower(Config::get('app.locale')).'.js', \Module::getPublicPath(KB_MODULE).'/js/main.js', \Module::getPublicPath(KB_MODULE).'/js/matomo.js''/js/main.js'])) !!}
+	    {!! Minify::javascript(\Eventy::filter('kb.javascripts', ['/js/jquery.js', '/js/bootstrap.js', '/js/lang.js', '/storage/js/vars.js', '/js/laroute.js', '/js/parsley/parsley.min.js', '/js/parsley/i18n/'.strtolower(Config::get('app.locale')).'.js', \Module::getPublicPath(KB_MODULE).'/js/main.js', \Module::getPublicPath(KB_MODULE).'/js/matomo.js', '/js/main.js'])) !!}
 	    @php
 	        } catch (\Exception $e) {
 	            // To prevent 500 errors on update.
