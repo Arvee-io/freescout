@@ -40,7 +40,7 @@
 	    @php
 	        try {
 	    @endphp
-	    {!! Minify::javascript(\Eventy::filter('kb.widget_form.javascripts', ['/js/jquery.js', '/js/bootstrap.js', '/js/lang.js', '/storage/js/vars.js', '/js/laroute.js', \Module::getPublicPath(KB_MODULE).'/js/widget_form.js', '/js/main.js'])) !!}
+	    {!! Minify::javascript(\Eventy::filter('kb.widget_form.javascripts', ['/js/jquery.js', '/js/bootstrap.js', '/js/lang.js', '/storage/js/vars.js', '/js/laroute.js', \Module::getPublicPath(KB_MODULE).'/js/widget_form.js', '/js/main.js', \Module::getPublicPath(KB_MODULE).'/js/matomo.js'])) !!}
 	    @php
 	        } catch (\Exception $e) {
 	            // To prevent 500 errors on update.
