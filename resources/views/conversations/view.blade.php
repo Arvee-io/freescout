@@ -28,10 +28,12 @@
 
                 <div class="conv-actions">
                     {{-- There should be no spaces between buttons --}}
-                    @if (!$conversation->isPhone() || ($customer && $customer->getMainEmail()))
+                    @if ((!$conversation->isPhone() || ($customer && $customer->getMainEmail())) && Eventy::filter('conversation.reply_button.enabled', true, $conversation) )
                         <span class="conv-reply conv-action glyphicon glyphicon-share-alt" data-toggle="tooltip" data-placement="bottom" title="{{ __("Reply") }}" aria-label="{{ __("Reply") }}" role="button"></span>
                     @endif
-                    <span class="conv-add-note conv-action glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="bottom" title="{{ __("Note") }}" aria-label="{{ __("Note") }}" role="button"></span>
+                    @if (Eventy::filter('conversation.note_button.enabled', true, $conversation))
+                        <span class="conv-add-note conv-action glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="bottom" title="{{ __("Note") }}" aria-label="{{ __("Note") }}" role="button"></span>
+                    @endif
                     @if (Auth::user()->can('delete', $conversation))
                         @if ($conversation->state != App\Conversation::STATE_DELETED)
                             <span class="hidden-xs conv-action glyphicon glyphicon-trash conv-delete" data-toggle="tooltip" data-placement="bottom" title="{{ __("Delete") }}" aria-label="{{ __("Delete") }}" role="button"></span>
@@ -70,6 +72,7 @@
                 </div>
 
                 <ul class="conv-info">
+                    @action('conversation.convinfo.prepend', $conversation, $mailbox)
                     @if ($conversation->state != App\Conversation::STATE_DELETED)
                         <li>
                             <div class="btn-group" id="conv-assignee" data-toggle="tooltip" title="{{ __("Assignee") }}: {{ $conversation->getAssigneeName(true) }}">
@@ -119,7 +122,7 @@
                                 </ul>
                             @endif
                         </div>
-                    </li><li class="conv-next-prev">
+                    </li>@action('conversation.convinfo.before_nav', $conversation, $mailbox)<li class="conv-next-prev">
                         <a href="{{ $conversation->urlPrev(App\Conversation::getFolderParam()) }}" class="glyphicon glyphicon-menu-left" data-toggle="tooltip" title="{{ __("Newer") }}"></a>
                         <a href="{{ $conversation->urlNext(App\Conversation::getFolderParam()) }}" class="glyphicon glyphicon-menu-right" data-toggle="tooltip" title="{{ __("Older") }}"></a>
                     </li>
@@ -261,7 +264,7 @@
                                 @if (!empty($threads[0]) && $threads[0]->type == App\Thread::TYPE_NOTE && $threads[0]->created_by_user_id != Auth::user()->id && $threads[0]->created_by_user)
                                     <div class="alert alert-warning alert-switch-to-note">
                                         <i class="glyphicon glyphicon-exclamation-sign"></i>
-                                        {!! __('This reply will go to the customer. :%switch_start%Switch to a note:switch_end if you are replying to :user_name.', ['%switch_start%' => '<a href="#" class="switch-to-note">', 'switch_end' => '</a>', 'user_name' => htmlspecialchars($threads[0]->created_by_user->getFullName()) ]) !!}
+                                        {!! __('This reply will go to the customer. :%switch_start%Switch to a note:%switch_end% if you are replying to :user_name.', ['%switch_start%' => '<a href="#" class="switch-to-note">', '%switch_end%' => '</a>', 'user_name' => htmlspecialchars($threads[0]->created_by_user->getFullName()) ]) !!}
                                     </div>
                                 @endif
 
@@ -288,9 +291,11 @@
 
         <div id="conv-layout-customer">
             @include('conversations/partials/customer_sidebar')
+            @action('conversation.after_customer_sidebar', $conversation)
         </div>
         <div id="conv-layout-main">
             @include('conversations/partials/threads')
+            @action('conversation.after_threads', $conversation)
         </div>
     </div>
 @endsection

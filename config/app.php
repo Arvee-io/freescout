@@ -18,7 +18,7 @@ return [
     | or any other location as required by the application or its packages.
     */
 
-    'version' => '1.8.118',
+    'version' => '1.8.159',
 
     /*
     |--------------------------------------------------------------------------
@@ -98,7 +98,7 @@ return [
     */
 
     'locale'          => env('APP_LOCALE', 'en'),
-    'locales'         => ['en', 'zh-CN', 'hr', 'cs', 'da', 'nl', 'fi', 'fr', 'de', 'it', 'ja', 'ko', 'no', 'fa', 'pl', 'pt-PT', 'pt-BR', 'ru', 'es', 'sk', 'sv'],
+    'locales'         => ['en', 'zh-CN', 'hr', 'cs', 'da', 'nl', 'fi', 'fr', 'de', 'it', 'ja', 'kz', 'ko', 'no', 'fa', 'pl', 'pt-PT', 'pt-BR', 'ru', 'es', 'sk', 'sv', 'tr'],
     'locales_rtl'     => ['fa'],
     'default_locale'  => 'en',
 
@@ -170,10 +170,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | FreeScout eepository
+    | FreeScout repository
     |-------------------------------------------------------------------------
     */
-    'freescout_repo' => 'https://github.com/freescout-helpdesk/freescout',
+    'freescout_repo' => 'https://freescout.net/github',
 
     /*
     |--------------------------------------------------------------------------
@@ -219,6 +219,7 @@ return [
     |-------------------------------------------------------------------------
     */
     'fetch_schedule'    => env('APP_FETCH_SCHEDULE', 1),
+    'fetch_unseen'      => env('APP_FETCH_UNSEEN', 1),
 
     /*
     |--------------------------------------------------------------------------
@@ -338,6 +339,26 @@ return [
     */
     'use_mail_date_on_fetching'    => env('APP_USE_MAIL_DATE_ON_FETCHING', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Don't add quotes around date in the SINCE IMAP instruction on fetching.
+    | https://github.com/freescout-help-desk/freescout/issues/4175
+    |
+    |-------------------------------------------------------------------------
+    */
+    'since_without_quotes_on_fetching'    => env('APP_SINCE_WITHOUT_QUOTES_ON_FETCHING', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Emails are fetched in bunches. The larger the bunch's size the more chances
+    | to face "Allowed memory size exhausted" error. The smaller its size the more
+    | connections are made to the mail server and the more time fetching takes.
+    | https://github.com/freescout-help-desk/freescout/issues/4343
+    |
+    |-------------------------------------------------------------------------
+    */
+    'fetching_bunch_size'    => env('APP_FETCHING_BUNCH_SIZE', 100),
+
      /*
     |--------------------------------------------------------------------------
     | Dashboard path.
@@ -391,13 +412,6 @@ return [
     |--------------------------------------------------------------------------
     */
     'custom_mail_headers' => env('APP_CUSTOM_MAIL_HEADERS', ''),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Library used to fetch emails: webklex/laravel-imap, webklex/php-imap
-    |-------------------------------------------------------------------------
-    */
-    'new_fetching_library'    => env('APP_NEW_FETCHING_LIBRARY', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -457,6 +471,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Limit non-admin users to only see customers with conversations
+    | in mailboxes they are assigned to. This option does not affect admin users.
+    |-------------------------------------------------------------------------
+    */
+    'limit_user_customer_visibility'    => env('APP_LIMIT_USER_CUSTOMER_VISIBILITY', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | By default X-Frame-Options header is enabled and set to SAMEORIGIN.
     | Via this option you can disable it (APP_X_FRAME_OPTIONS=false) or set custom value:
     | - DENY
@@ -472,6 +494,7 @@ return [
     */
     'csp_enabled'    => env('APP_CSP_ENABLED', true),
     'csp_script_src' => env('APP_CSP_SCRIPT_SRC', ''),
+    'csp_custom'     => env('APP_CSP_CUSTOM', ''),
 
     /*
     |--------------------------------------------------------------------------

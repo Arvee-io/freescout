@@ -9,8 +9,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {!! \Helper::cspMetaTag() !!}
-
-    <title>@if ($__env->yieldContent('title_full'))@yield('title_full') @elseif ($__env->yieldContent('title'))@yield('title') - {{ config('app.name', 'FreeScout') }} @else{{ config('app.name', 'FreeScout') }}@endif</title>
+    @php $app_name = \Eventy::filter('layout.title.name', config('app.name', 'FreeScout')); @endphp
+    <title>@if ($__env->yieldContent('title_full'))@yield('title_full') @elseif ($__env->yieldContent('title'))@yield('title') - {{ $app_name }} @else{{ $app_name }}@endif</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="@filter('layout.favicon', URL::asset('favicon.ico'))">
@@ -221,7 +221,7 @@
                                         </li>
                                         <li><a href="{{ route('conversations.search', ['f' => ['following' => 'yes']]) }}"><i class="glyphicon glyphicon-chevron-right"></i> {{ __("Conversations I'm following") }}</a></li>
                                         <li><a href="{{ route('conversations.search', ['f' => ['assigned' => Auth::user()->id, 'status' => [App\Conversation::STATUS_ACTIVE, App\Conversation::STATUS_PENDING]]]) }}"><i class="glyphicon glyphicon-chevron-right"></i> {{ __('My open conversations') }}</a></li>
-                                        @if (in_array(Route::currentRouteName(), ['mailboxes.view', 'mailboxes.view.folder', 'conversations.view']))
+                                        @if (in_array(Route::currentRouteName(), ['mailboxes.view', 'mailboxes.view.folder']))
                                             <li><a href="{{ route('conversations.search', ['f' => ['mailbox' => app('request')->id]]) }}"><i class="glyphicon glyphicon-chevron-right"></i> {{ __("All from current mailbox") }}</a></li>
                                         @endif
                                     </ul>

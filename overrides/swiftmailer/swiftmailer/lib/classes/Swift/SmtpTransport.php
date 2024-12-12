@@ -27,7 +27,7 @@ class Swift_SmtpTransport extends Swift_Transport_EsmtpTransport
      * @param int    $port
      * @param string $encryption
      */
-    public function __construct($host = 'localhost', $port = 25, $encryption = null)
+    public function __construct($host = 'localhost', $port = 25, $encryption = null, $auth_mode = '')
     {
         parent::__construct(...Swift_DependencyContainer::getInstance()->createDependenciesFor('transport.smtp'));
         // call_user_func_array(
@@ -39,5 +39,8 @@ class Swift_SmtpTransport extends Swift_Transport_EsmtpTransport
         $this->setHost($host);
         $this->setPort($port);
         $this->setEncryption($encryption);
+        if ($auth_mode == 'XOAUTH2') {
+            $this->setAuthMode($auth_mode);
+        }
     }
 }

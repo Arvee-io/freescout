@@ -241,7 +241,10 @@ class Header {
             $raw_imap_headers = (array)\imap_rfc822_parse_headers($raw_headers);
             foreach ($raw_imap_headers as $key => $values) {
                 $key = str_replace("-", "_", $key);
-                $imap_headers[$key] = $values;
+                $values = $this->sanitizeHeaderValue($values);
+                if (!is_array($values) || (is_array($values) && count($values))) {
+                    $imap_headers[$key] = $values;
+                }
             }
         }
         $lines = explode("\r\n", preg_replace("/\r\n\s/", ' ', $raw_headers));
@@ -289,7 +292,7 @@ class Header {
         foreach ($headers as $key => $values) {
             if (isset($imap_headers[$key])) continue;
             $value = null;
-            switch ($key) {
+            switch ((string)$key) {
                 case 'from':
                 case 'to':
                 case 'cc':
@@ -322,10 +325,35 @@ class Header {
                     }
                     break;
             }
-            $headers[$key] = $value;
+            $value = $this->sanitizeHeaderValue($value);
+            if (!is_array($value) || (is_array($value) && count($value))) {
+                $headers[$key] = $value;
+            } elseif (is_array($value) && !count($value) && isset($headers[$key])) {
+                unset($headers[$key]);
+            }
         }
 
         return (object)array_merge($headers, $imap_headers);
+    }
+
+    // https://github.com/freescout-help-desk/freescout/issues/4158
+    public function sanitizeHeaderValue($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $i => $v) {
+                if (is_object($v)
+                    && isset($v->mailbox)
+                    && ($v->mailbox == '>' || $v->mailbox == 'INVALID_ADDRESS') 
+                    && ((isset($v->host) && ($v->host == '.SYNTAX-ERROR.' || $v->host === null)) || !isset($v->host))
+                ) {
+                    echo 'unset: '.$v->mailbox;
+
+                    unset($value[$i]);
+                }
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -403,9 +431,7 @@ class Header {
             return $str;
         }
 
-        if (strtolower($from) == 'iso-2022-jp'){
-           $from = 'iso-2022-jp-ms';
-        }
+        $from = \MailHelper::substituteEncoding($from);
 
         try {
             if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
@@ -489,8 +515,8 @@ class Header {
                         }
                     }
                 }
-            } elseif ($decoder === 'iconv' && $is_utf8_base) {
-                $value = iconv_mime_decode($value);
+            } elseif ($decoder === 'iconv') {
+                $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
             } elseif ($is_utf8_base) {
                 $value = mb_decode_mimeheader($value);
             }
@@ -768,15 +794,52 @@ class Header {
                 if(strpos($date, '&nbsp;') !== false){
                     $date = str_replace('&nbsp;', ' ', $date);
                 }
+                if (str_contains($date, ' UT ')) {
+                    $date = str_replace(' UT ', ' UTC ', $date);
+                }
                 $parsed_date = Carbon::parse($date);
             } catch (\Exception $e) {
                 switch (true) {
                     case preg_match('/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/i', $date) > 0:
                         $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
                         break;
+                    case preg_match('/([0-9]{2} [A-Z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} [+-][0-9]{1,4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} [+-][0-9]{1,4})+$/i', $date) > 0:
+                        $parts = explode(' ', $date);
+                        array_splice($parts, -2);
+                        $date = implode(' ', $parts);
+                        break;
+                    case preg_match('/([A-Z]{2,4}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i', $date) > 0:
+                        $array = explode(',', $date);
+                        array_shift($array);
+                        $date = Carbon::createFromFormat("d M Y H:i:s O", trim(implode(',', $array)));
+                        break;
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                         $date .= 'C';
+                        break;
+                    case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}[\,]\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i', $date) > 0:
+                        $date = str_replace(',', '', $date);
+                        break;
+                    // match case for: Di., 15 Feb. 2022 06:52:44 +0100 (MEZ)/Di., 15 Feb. 2022 06:52:44 +0100 (MEZ)
+                    case preg_match('/([A-Z]{2,3}\.\,\ [0-9]{1,2}\ [A-Z]{2,3}\.\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \([A-Z]{3,4}\))\/([A-Z]{2,3}\.\,\ [0-9]{1,2}\ [A-Z]{2,3}\.\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \([A-Z]{3,4}\))+$/i', $date) > 0:
+                        $dates = explode('/', $date);
+                        $date = array_shift($dates);
+                        $array = explode(',', $date);
+                        array_shift($array);
+                        $date = trim(implode(',', $array));
+                        $array = explode(' ', $date);
+                        array_pop($array);
+                        $date = trim(implode(' ', $array));
+                        $date = Carbon::createFromFormat("d M. Y H:i:s O", $date);
+                        break;
+                    // match case for: fr., 25 nov. 2022 06:27:14 +0100/fr., 25 nov. 2022 06:27:14 +0100
+                    case preg_match('/([A-Z]{2,3}\.\,\ [0-9]{1,2}\ [A-Z]{2,3}\.\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})\/([A-Z]{2,3}\.\,\ [0-9]{1,2}\ [A-Z]{2,3}\.\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i', $date) > 0:
+                        $dates = explode('/', $date);
+                        $date = array_shift($dates);
+                        $array = explode(',', $date);
+                        array_shift($array);
+                        $date = trim(implode(',', $array));
+                        $date = Carbon::createFromFormat("d M. Y H:i:s O", $date);
                         break;
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ \+[0-9]{2,4}\ \(\+[0-9]{1,2}\))+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}[\,|\ \,]\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}.*)+$/i', $date) > 0:
@@ -792,7 +855,12 @@ class Header {
                     $parsed_date = Carbon::parse($date);
                 } catch (\Exception $_e) {
                     if (!isset($this->config["fallback_date"])) {
-                        throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
+                        // Simply use current date.
+                        // https://github.com/freescout-help-desk/freescout/issues/4159
+                        $parsed_date = Carbon::now();
+                        \Helper::logException(new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e));
+
+                        //throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
                     } else {
                         $parsed_date = Carbon::parse($this->config["fallback_date"]);
                     }

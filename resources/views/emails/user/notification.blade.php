@@ -41,7 +41,7 @@
                                         	[{{ $mailbox->name }}]
                                         </p>
 				                        <p style="display:inline; font-family:Arial, 'Helvetica Neue', Helvetica, Tahoma, sans-serif; color:#444; line-height:22px; font-size:16px; margin:0;">
-                                            {{ __('Replying to this notification will email :name', ['name' => $customer->getFirstName(true)]) }} (<a href="mailto:{{ $conversation->customer_email }}" style="color:#3f8abf; text-decoration:none;">{{ $conversation->customer_email }}</a>)
+                                            {{ __('Replying to this notification will email :name', ['name' => ($customer ? $customer->getFirstName(true) : '')]) }} (<a href="mailto:{{ $conversation->customer_email }}" style="color:#3f8abf; text-decoration:none;">{{ $conversation->customer_email }}</a>)
                                             @if ($conversation->getCcArray())
                                             	<br/><small>CC: {{ implode(', ', $conversation->getCcArray()) }}</small>
                                             @endif
@@ -97,7 +97,7 @@
 							                    <td height="10" bgcolor="{{ $conversation->getStatusColor() }}" style="color:#ffffff; font-family:Arial, 'Helvetica Neue', Helvetica, Tahoma, sans-serif; line-height:12px; font-size:12px; margin-top: 3px;border-radius: 2px; {{--@if ($conversation->status == App\Conversation::STATUS_PENDING)border: 1px solid #ccc; color: #727d87;@endif--}}">{{ strtoupper($conversation->getStatusName()) }}</td>
 							                </tr>
 							            </table>
-							            @if ($conversation->user_id)
+							            @if ($conversation->user_id && $conversation->user)
 								            <table border="0" cellspacing="0" cellpadding="0">
 								                <tr>
 								                    <td style="font-family:Arial, 'Helvetica Neue', Helvetica, Tahoma, sans-serif; color:#B5B9BD; line-height:16px; font-size:12px; padding-top: 8px;text-align:right;">

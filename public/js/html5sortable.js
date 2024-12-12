@@ -1,5 +1,8 @@
 // https://github.com/Bernardo-Castilho/dragdroptouch
-let DragDropTouch;
+//let DragDropTouch;
+if (typeof(DragDropTouch) == "undefined") {
+    DragDropTouch = {};
+}
 (function (DragDropTouch_1) {
     'use strict';
     /**
@@ -274,6 +277,42 @@ let DragDropTouch;
         // ** utilities
         // ignore events that have been handled or that involve more than one touch
         DragDropTouch.prototype._shouldHandle = function (e) {
+            var j_target = $(e.target);
+
+            // console.log(e.target);
+            // console.log(j_target.parent().parent().parent());
+            // console.log(j_target.parent().parent().parent().hasClass('panel-sortable'));
+
+            // This function runs only on mobile devices
+            // Apply DragDropTouch only when dragging an element with draggable="true"
+            // https://github.com/freescout-helpdesk/freescout/issues/3800
+            if (!j_target.attr('draggable') 
+                && (typeof(e.target.parentElement) != "undefined" && !$(e.target.parentElement).attr('draggable'))
+                && (typeof(e.target.parentElement.parentElement) != "undefined" && !$(e.target.parentElement.parentElement).attr('draggable'))
+                && !j_target.parent().parent().parent().hasClass('panel-sortable')
+            ) {
+                return false;
+            }
+            
+            // Fix Bootstrap submenu.
+            // https://github.com/freescout-helpdesk/freescout/issues/3708
+            /*if (typeof(e.target) != "undefined") {
+                if (e.target.classList.contains('dropdown-toggle')) {
+                    return false;
+                }
+                if (e.target.tagName == 'A'
+                    && typeof(e.target.parentElement) != "undefined"
+                    && typeof(e.target.parentElement.parentElement) != "undefined"
+                    && e.target.parentElement.parentElement.classList.contains('dropdown-menu')
+                ) {
+                    return false;
+                }
+            }*/
+            // Conversations list fix
+            // https://github.com/freescout-helpdesk/freescout/issues/3724
+            /*if ($('table.table-conversations:first').length) {
+                return false;
+            }*/
             return e &&
                 !e.defaultPrevented &&
                 e.touches && e.touches.length < 2;

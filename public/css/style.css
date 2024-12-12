@@ -600,7 +600,8 @@ select.form-control {
 .btn-danger.btn-light:hover {
     background-color: #c9302c;
 }
-.has-error.help-block {
+.has-error.help-block,
+.parsley-required {
     color: #a94442;
 }
 .has-error .form-control.parsley-exclude {
@@ -1001,6 +1002,17 @@ a h4 {
  */
 .summernote-inservar {
     max-width: 200px;
+}
+/* 
+This is needed to avoid an issue with the SPAN tag being added
+https://github.com/freescout-help-desk/freescout/issues/4354
+*/
+.note-editor .note-editable span,
+.note-editor .note-editable div {
+    /*background-color: inherit;*/
+    font-size: inherit;
+    /* https://github.com/freescout-help-desk/freescout/issues/4367 */
+    /*font-weight: inherit;*/
 }
 .note-editor.note-frame {
     border-color: #dee4e9 !important;
@@ -1553,6 +1565,9 @@ table.table-conversations td.conv-attachment {
     color: #676d7a;
 }
 .table-conversations .glyphicon-earphone {
+    color: #93a1af;
+}
+.table-conversations .glyphicon-comment {
     color: #93a1af;
 }
 .table-pager {
@@ -2431,6 +2446,9 @@ button.conv-checkbox-clear {
     margin-bottom: 10px;
 }
 .phone-conv-fields {
+    display: none;
+}
+.custom-conv-fields{
     display: none;
 }
 .toggle-field {
@@ -3357,11 +3375,11 @@ ul.sidebar-block-list {
     background-color: #f9fafa;
 }
 .web-notification.is-unread a {
-    background-color: #f1faff;
+    background-color: #d5f0ff;
 }
 .web-notification.is-unread a:hover,
 .web-notification.is-unread a:focus {
-    background-color: #e7f6ff;
+    background-color: #bce7ff;
 }
 .web-notification-msg {
     line-height: 18px;
@@ -4397,7 +4415,8 @@ a.disabled:focus {
     padding: 4px 6px 4px 6px;
     vertical-align: inherit;
 }
-#send_test_log {
+#send_test_log,
+#fetch_test_log {
     max-height: 200px;
 }
 .glyphicon-spin {
